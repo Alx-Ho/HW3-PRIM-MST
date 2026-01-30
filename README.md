@@ -1,17 +1,19 @@
 # HW 3: Prim's algorithm
 
+Notes: I used code LLMs to nicely comment and format my code.
+
 In this assignment, you'll implement Prim's algorithm, a non-trivial greedy algorithm used to construct minimum spanning trees. 
 
 ## Tasks
 
 ### Coding
 
-* [TODO] Complete the `construct_mst` method found in `mst/graph.py`. All necessary modules have already been imported. You should not rely on any other dependencies (e.g. networkx). 
+* [DONE] `construct_mst` implemented with Prim’s algorithm using a min-heap and outputs the MST adjacency matrix in `self.mst`.
 
 ### Development
 
-* [TODO] Add more assertions to the `check_mst` function in `test/test_mst.py`.
-* [TODO] Write at least one more unit test (in the `test_mst.py` file) for your `construct_mst` implementation. (Two unit tests have already been provided: the first operates on a small graph of four nodes, and the second on a larger graph of 140 single cells, projected onto a lower dimensional subspace.)
+* [DONE] `check_mst` now asserts shape, symmetry, edge subset, edge count (n−1), connectivity, and total weight.
+* [DONE] Added a third unit test on a 4‑node cycle with tied weights to validate correctness under multiple valid MSTs.
 * [Optional] Make your package `pip` installable. (Refer to prevous assignments for more in-depth information.)
 * [Optional] Automate testing with `pytest` and GitHub Actions, and add a status badge to this README file. (Refer to previous assignments for more in-depth information.)
 
