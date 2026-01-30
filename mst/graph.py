@@ -41,4 +41,48 @@ class Graph:
         `heapify`, `heappop`, and `heappush` functions.
 
         """
-        self.mst = None
+        # Number of vertices in the graph (adjacency matrix is n x n)
+        n = self.adj_mat.shape[0]
+        # Handle empty graph edge case
+        if n == 0:
+            self.mst = np.zeros_like(self.adj_mat)
+            return
+
+        # MST adjacency matrix to populate
+        mst = np.zeros_like(self.adj_mat)
+        # Track which vertices have been added to the MST
+        visited = [False] * n
+        # Start Prim's algorithm from vertex 0
+        visited[0] = True
+
+        # Min-heap of candidate edges (weight, from_vertex, to_vertex)
+        heap = []
+        # Seed the heap with edges from the starting vertex
+        for v in range(n):
+            w = self.adj_mat[0, v]
+            if w > 0:
+                heapq.heappush(heap, (w, 0, v))
+
+        # Count how many edges have been added to the MST
+        edges_used = 0
+        # Continue until MST has n-1 edges or no candidates remain
+        while heap and edges_used < n - 1:
+            # Always pick the lightest available edge
+            w, u, v = heapq.heappop(heap)
+            # Skip if the destination is already in the MST
+            if visited[v]:
+                continue
+            # Add the new vertex and its connecting edge to the MST
+            visited[v] = True
+            mst[u, v] = w
+            mst[v, u] = w
+            edges_used += 1
+
+            # Push all outgoing edges from the newly added vertex
+            for nxt in range(n):
+                w_next = self.adj_mat[v, nxt]
+                if not visited[nxt] and w_next > 0:
+                    heapq.heappush(heap, (w_next, v, nxt))
+
+        # Store the constructed MST adjacency matrix
+        self.mst = mst

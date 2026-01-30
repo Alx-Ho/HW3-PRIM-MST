@@ -29,10 +29,39 @@ def check_mst(adj_mat: np.ndarray,
     def approx_equal(a, b):
         return abs(a - b) < allowed_error
 
+    # Same dimensions as the original graph.
+    assert adj_mat.shape == mst.shape, 'MST must have same shape as adjacency matrix'
+    # Undirected MST should be symmetric.
+    assert np.allclose(mst, mst.T), 'MST adjacency matrix must be symmetric'
+    # MST edges must be a subset of the original graph's edges.
+    assert np.all((mst == 0) | np.isclose(mst, adj_mat, atol=allowed_error)), (
+        'MST must only use edges from original graph'
+    )
+
     total = 0
+    edge_count = 0
     for i in range(mst.shape[0]):
         for j in range(i+1):
             total += mst[i, j]
+            if mst[i, j] > 0:
+                edge_count += 1
+    # A spanning tree on n nodes has exactly n-1 edges.
+    assert edge_count == mst.shape[0] - 1, 'MST must have exactly n-1 edges'
+
+    # Connectivity check via BFS on mst
+    n = mst.shape[0]
+    visited = [False] * n
+    stack = [0]
+    visited[0] = True
+    while stack:
+        u = stack.pop()
+        for v in range(n):
+            if mst[u, v] > 0 and not visited[v]:
+                visited[v] = True
+                stack.append(v)
+    # A valid MST must connect all vertices.
+    assert all(visited), 'MST must be connected'
+    # Total MST weight should match expected weight.
     assert approx_equal(total, expected_weight), 'Proposed MST has incorrect expected weight'
 
 
@@ -71,4 +100,18 @@ def test_mst_student():
     TODO: Write at least one unit test for MST construction.
     
     """
-    pass
+    # 4-node cycle with equal-weight edges (1) and heavier diagonals (2).
+    # Multiple MSTs exist here; any three cycle edges give the same total weight.
+    # This checks that the implementation handles ties and still returns a valid MST.
+    adj = np.array(
+        [
+            [0, 1, 2, 1],
+            [1, 0, 1, 2],
+            [2, 1, 0, 1],
+            [1, 2, 1, 0],
+        ],
+        dtype=float,
+    )
+    g = Graph(adj)
+    g.construct_mst()
+    check_mst(g.adj_mat, g.mst, 3)
